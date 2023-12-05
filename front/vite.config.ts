@@ -67,14 +67,14 @@ export default ({mode, command}) => {
           rewrite: (path: string) => path.replace(/^\/api/, ""),
         },
       },
-      css: {
-        preprocessorOptions: {
-          // 全局样式引入
-          scss:{
-            additionalData: `@import "@/assets/styles/global.scss";`,
-          }
-        },
-      }
+    },
+    css: {
+      preprocessorOptions: {
+        // 全局样式引入
+        scss:{
+          additionalData: `@import "@/assets/styles/global.scss";`,
+        }
+      },
     }
   })
 }
