@@ -15,6 +15,13 @@ const HomePage: RouterInterface = {
   component: lazy(() => import(/* webpackChunkName: "home" */ '@/Pages/Home/index')),
   children: []
 }
+const UploadPage: RouterInterface = {
+  key: 2,
+  name: 'Upload',
+  path: '/upload',
+  component: lazy(() => import(/* webpackChunkName: "upload" */ '@/Pages/Upload/index')),
+  children: []
+}
 const NotFoundPage: RouterInterface = {
   key: 1,
   name: 'NotFound',
@@ -25,6 +32,7 @@ const NotFoundPage: RouterInterface = {
 
 const AllRouters: RouterInterface[] = ([
   HomePage,
+  UploadPage,
   NotFoundPage,
 ])
 
