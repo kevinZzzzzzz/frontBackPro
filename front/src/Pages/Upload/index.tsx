@@ -1,18 +1,20 @@
-import { getFileSize, sliceFile } from "@/utils";
+import { calculateHash, getFileSize, sliceFile } from "@/utils";
 import { Flex, Progress } from "antd";
 import React, { useState, useEffect } from "react";
 import styles from "./styles/index.module.scss";
 function UploadPage(props: any) {
   const [container, setContainer] = useState<{
     file: any[],
-    hash?: any[],
+    hash?: string,
   }>({
     file: [],
-    hash: [],
+    hash: '',
   }); // 储存文件
   const [isPause, setIsPause] = useState(false); // 是否暂停
   const [fileSize, setFileSize] = useState(""); // 文件大小
+  // const hashPress = useRef(0); // 文件hash值计算进度
   const [hashPress, setHashPress] = useState(0); // 文件hash值计算进度
+  const [chunksList, setChunksList] = useState([]) // 切片文件列表
   /* 
     handleFileChange 监听文件上传框导入文件信息
   */
@@ -20,10 +22,12 @@ function UploadPage(props: any) {
     // 先清空
     setContainer({
       file: [],
-      hash: [],
+      hash: '',
     });
+    setHashPress(0)
     setFileSize('')
     const files = e.target.files;
+    console.log(files, 'files===============')
     let sizeAll = 0;
     // files 数据类型是FileList需要先转数组
     Array.from(files)?.forEach((file: {
@@ -36,7 +40,7 @@ function UploadPage(props: any) {
     }
     if (!files || !files.length) return;
     setContainer({
-      ...setContainer,
+      ...container,
       file: files,
     });
   };
@@ -44,14 +48,33 @@ function UploadPage(props: any) {
     handleUpload 上传文件按钮触发
   */
   const handleUpload = async () => {
-    console.log("handleUpload", container.file);
     if (container.file.length === 0) {
       return 
     }
     // 文件切片
     const fileChunk = sliceFile(container.file, fileSize);
-    console.log(fileChunk, 'fileChunk')
-    // const hash = await 
+    console.log("handleUpload", fileChunk);
+    console.time("samplehash");
+    await calculateHash(fileChunk, (progress, hash) => {
+      if (hash) {
+        setContainer({
+          ...container,
+          hash: hash,
+        });
+        setTimeout(() => {
+          setHashPress(progress)
+        }, 1000);
+        console.timeEnd("samplehash");
+      } else {
+        setHashPress(progress)
+      }
+    })
+    // const fileChunkTemp = fileChunk.map((chunk, index) => {
+    //   return {
+    //     ...chunk,
+    //     index: index,
+    //   }
+    // })
   }
 
   return (
