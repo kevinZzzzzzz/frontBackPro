@@ -1,4 +1,4 @@
-export const SIZE: number = 0.002 * 1024 * 1024; // 限制切片大小
+export const SIZE: number = 0.2 * 1024 * 1024; // 限制切片大小
 /* 
   getFileSize  文件大小计算
     字节单位进制转换
@@ -38,7 +38,7 @@ export const sliceFile = (file: any[], fileSize, size = SIZE) => {
       const curSize = cur + size > chunkSize ? chunkSize - cur : size;
       const chunkBlob = chunk.slice(cur, cur + curSize);
       chunks.push({
-        chunkBlob,
+        file: chunkBlob,
         filename
       });
       cur += curSize;
@@ -55,7 +55,7 @@ export const sliceFile = (file: any[], fileSize, size = SIZE) => {
     @params
       chunks 文件分片
 */
-export const calculateHash = (chunks: any[], cb: Function) => {
+export const calculateHash = async (chunks: any[], cb: Function) => {
   return new Promise((resolve, reject) => {
     const worker = new Worker('/hash.js') 
     worker.postMessage({chunks})
@@ -64,11 +64,11 @@ export const calculateHash = (chunks: any[], cb: Function) => {
       console.log('监听webworker的通知----------------', data)
       const {progress, hash} = data
       if (progress === 100 && hash) {
-        resolve(hash)
         cb(progress, hash)
+        resolve(hash)
       } else if  (progress < 100) {
-        resolve(progress)
         cb(progress)
+        resolve(progress)
       } else {
         reject(new Error('hash计算失败'))
       }

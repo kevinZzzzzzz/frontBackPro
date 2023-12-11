@@ -14,7 +14,7 @@ self.onmessage = function(e) {
   
   const loadNext = index => {
     const reader = new FileReader()
-    reader.readAsArrayBuffer(chunks[index].chunkBlob)
+    reader.readAsArrayBuffer(chunks[index].file)
     reader.onload = e => {
       // 累加器自增, 不要依赖index
       count++

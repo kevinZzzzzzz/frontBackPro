@@ -3,7 +3,7 @@ import { Flex, Progress } from "antd";
 import React, { useState, useEffect } from "react";
 import styles from "./styles/index.module.scss";
 function UploadPage(props: any) {
-  const [container, setContainer] = useState<{
+  const container = useRef<{
     file: any[],
     hash?: string,
   }>({
@@ -20,10 +20,10 @@ function UploadPage(props: any) {
   */
   const handleFileChange = (e) => {
     // 先清空
-    setContainer({
+    container.current = {
       file: [],
       hash: '',
-    });
+    };
     setHashPress(0)
     setFileSize('')
     const files = e.target.files;
@@ -39,51 +39,52 @@ function UploadPage(props: any) {
       setFileSize(getFileSize(sizeAll));
     }
     if (!files || !files.length) return;
-    setContainer({
+    container.current = {
       ...container,
       file: files,
-    });
+    };
   };
   /* 
     handleUpload 上传文件按钮触发
   */
   const handleUpload = async () => {
-    if (container.file.length === 0) {
+    if (container.current.file.length === 0) {
       return 
     }
     // 文件切片
-    const fileChunk = sliceFile(container.file, fileSize);
+    const fileChunk = sliceFile(container.current.file, fileSize);
     console.log("handleUpload", fileChunk);
     console.time("samplehash");
     await calculateHash(fileChunk, (progress, hash) => {
       if (hash) {
-        setContainer({
-          ...container,
+        container.current = {
+          ...container.current,
           hash: hash,
-        });
-        setTimeout(() => {
-          setHashPress(progress)
-        }, 1000);
+        };
         console.timeEnd("samplehash");
-      } else {
-        setHashPress(progress)
+        const fileChunkTemp = fileChunk.map((chunk, index) => {
+          const chunkName = container.current.hash + "-" + index;
+          return {
+            fileHash: container.current.hash,
+            chunk: chunk.file,
+            index,
+            hash: chunkName,
+            // progress: uploadedList.indexOf(chunkName) > -1 ? 100 : 0,
+            size: chunk.file.size
+          }
+        })
+        console.log(fileChunkTemp, 'fileChunkTemp')
       }
+      setHashPress(progress)
     })
-    // const fileChunkTemp = fileChunk.map((chunk, index) => {
-    //   return {
-    //     ...chunk,
-    //     index: index,
-    //   }
-    // })
   }
-
   return (
     <div className={styles.container}>
       <input type="file" multiple onChange={handleFileChange} />
       <br />
       <hr />
       <Flex gap="small" wrap="wrap">
-        <Button type="primary" className={!container.file.length && styles.container_nofile} onClick={handleUpload}>上传</Button>
+        <Button type="primary" className={!container.current.file.length && styles.container_nofile} onClick={handleUpload}>上传</Button>
         {isPause ? (
           <Button type="primary" danger>
             恢复
