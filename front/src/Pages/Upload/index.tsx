@@ -1,4 +1,4 @@
-import { calculateHash, getFileSize, sliceFile } from "@/utils";
+import { calculateHash, getFileSize, sliceFile, Status } from "@/utils";
 import { Flex, Progress } from "antd";
 import React, { useState, useEffect } from "react";
 import styles from "./styles/index.module.scss";
@@ -12,9 +12,8 @@ function UploadPage(props: any) {
   }); // 储存文件
   const [isPause, setIsPause] = useState(false); // 是否暂停
   const [fileSize, setFileSize] = useState(""); // 文件大小
-  // const hashPress = useRef(0); // 文件hash值计算进度
   const [hashPress, setHashPress] = useState(0); // 文件hash值计算进度
-  const [chunksList, setChunksList] = useState([]) // 切片文件列表
+  const chunksList = useRef([]) // 切片文件列表
   /* 
     handleFileChange 监听文件上传框导入文件信息
   */
@@ -67,15 +66,42 @@ function UploadPage(props: any) {
           return {
             fileHash: container.current.hash,
             chunk: chunk.file,
+            filename: chunk.filename,
             index,
             hash: chunkName,
             // progress: uploadedList.indexOf(chunkName) > -1 ? 100 : 0,
             size: chunk.file.size
           }
         })
-        console.log(fileChunkTemp, 'fileChunkTemp')
+        chunksList.current = fileChunkTemp
+        uploadChunks()
       }
       setHashPress(progress)
+    })
+  }
+  const uploadChunks = async () => {
+    console.log(chunksList.current, 'chunksList')
+    const list = chunksList.current.map(({ fileHash, chunk, index, hash, filename}, idx) => {
+      const form = new FormData()
+      form.append('fileHash', fileHash)
+      form.append('hash', hash)
+      form.append('filename', filename)
+      form.append('chunk', chunk)
+      console.log(form, 'form')
+      return { form, index, status: Status.wait };
+    })
+    try {
+      await sendRequest(list)
+    } catch (e) {
+      console.error()
+    }
+  }
+
+  const sendRequest = async (list, max = 4) => {
+    list.forEach((item, index) => {
+      window.$api.uploadFile(item.form).then((res: any) => {
+        console.log(res, 'res') 
+      })
     })
   }
   return (

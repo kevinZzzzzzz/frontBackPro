@@ -1,4 +1,11 @@
 export const SIZE: number = 0.2 * 1024 * 1024; // 限制切片大小
+export const Status = {
+  wait: "wait",
+  pause: "pause",
+  uploading: "uploading",
+  error: "error",
+  done: "done",
+};
 /* 
   getFileSize  文件大小计算
     字节单位进制转换

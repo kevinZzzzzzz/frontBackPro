@@ -11,6 +11,15 @@ export default {
     for example：
   */
   async xxx (data: any = {}): Promise<AxiosResponse<any, any>> {
-    return await http.post(setProxy('/xxx'), { data }, true, true)
+    return await http.post(setProxy('/xxx'), { data }, false, false)
+  },
+  /* 
+    uploadFile 上传文件
+  */
+  async uploadFile (data: any = {}): Promise<AxiosResponse<any, any>> {
+    console.log(data, 'data')
+    return await http.post(setProxy('/kevin/upload'), { data }, {
+      'Content-Type': 'multipart/form-data'
+    }, false, false)
   }
 }

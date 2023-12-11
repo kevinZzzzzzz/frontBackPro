@@ -10,8 +10,8 @@ class HttpRequest {
     return await this.request({ method: 'GET', url }, isShowToast, isShowLoading)
   }
 
-  async post (url: string, data: any, isShowToast = false, isShowLoading = false) {
-    return await this.request({ method: 'POST', url, ...data }, isShowToast, isShowLoading)
+  async post (url: string, data: any, headers?: any, isShowToast = false, isShowLoading = false) {
+    return await this.request({ method: 'POST', url, ...data, headers }, isShowToast, isShowLoading)
   }
 
   async request (config: any, isShowToast = false, isShowLoading = false) {
