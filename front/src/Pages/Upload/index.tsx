@@ -87,7 +87,6 @@ function UploadPage(props: any) {
       form.append('hash', hash)
       form.append('filename', filename)
       form.append('chunk', chunk)
-      console.log(form, 'form')
       return { form, index, status: Status.wait };
     })
     try {

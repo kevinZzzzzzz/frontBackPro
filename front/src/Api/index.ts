@@ -17,7 +17,6 @@ export default {
     uploadFile 上传文件
   */
   async uploadFile (data: any = {}): Promise<AxiosResponse<any, any>> {
-    console.log(data, 'data')
     return await http.post(setProxy('/kevin/upload'), { data }, {
       'Content-Type': 'multipart/form-data'
     }, false, false)
