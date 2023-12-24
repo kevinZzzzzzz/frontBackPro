@@ -25,7 +25,7 @@ class HttpRequest {
     instance.interceptors.request.use(
       (config: any) => {
         config.baseURL = location.origin
-        config.timeout = 5000; // 请求超时
+        // config.timeout = 5000; // 请求超时
         return config
       },
 
@@ -44,7 +44,7 @@ class HttpRequest {
                 resolve(data);
                 break;
               default: // 其余异常
-                reject(response);
+                reject(data);
                 break;
             }
           } else {

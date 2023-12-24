@@ -10,9 +10,7 @@ class Controller {
   }
 
   async handleUpload(req, res) {
-    const multipart = new multiparty.Form({
-      uploadDir: this.uploadPat,
-    });
+    const multipart = new multiparty.Form();
     multipart.parse(req, async (err, fields, files) => {
       if (err) {
         console.log(err);
@@ -22,8 +20,8 @@ class Controller {
         });
         return false;
       }
-      const [chunk] = files.chunk;
-      const [hash] = fields.hash;
+      const [chunk] = files?.chunk;
+      const [hash] = fields?.hash;
       const [filename] = fields.filename;
       const [fileHash] = fields.fileHash;
       const filePath = path.resolve(
@@ -33,19 +31,18 @@ class Controller {
       const chunkDir = path.resolve(this.uploadPath, fileHash);
       try {
         // 文件存在直接返回
-        if (fse.existsSync(filePath)) {
-          res.statusCode = 200;
-          res.json({
-            code: 500,
-            msg: `file exist`,
-          });
-          res.send();
-          return false;
-        }
+        // if (fse.existsSync(filePath)) {
+        //   res.statusCode = 200;
+        //   res.json({
+        //     code: 500,
+        //     msg: `file exist`,
+        //   });
+        //   res.send();
+        // }
         /* 检测文件夹是否存在 */
-        if (!fse.existsSync(chunkDir)) {
-          await fse.mkdirs(chunkDir);
-        }
+        // if (!fse.existsSync(chunkDir)) {
+        //   await fse.mkdirs(chunkDir);
+        // }
         await fse.move(chunk.path, `${chunkDir}/${hash}`);
         res.statusCode = 200;
         res.json({
@@ -56,7 +53,7 @@ class Controller {
       } catch (e) {
         res.statusCode = 200;
         res.json({
-          code: 500,
+          code: 501,
           msg: e.toString(),
         });
       }

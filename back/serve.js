@@ -8,7 +8,7 @@ import cors from "cors";
 import Controller from "./controller.js";
 
 const __dirname = path.resolve();
-const UPLOAD_DIR = path.resolve(__dirname, "..", "target"); // 大文件存储目录
+const UPLOAD_DIR = path.resolve(__dirname, "./", "target"); // 大文件存储目录
 const ctrl = new Controller(UPLOAD_DIR)
 const app = express();
 const server = http.createServer(app);

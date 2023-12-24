@@ -1,4 +1,4 @@
-export const SIZE: number = 0.2 * 1024 * 1024; // 限制切片大小
+export const SIZE: number = .2 * 1024 * 1024; // 限制切片大小
 export const Status = {
   wait: "wait",
   pause: "pause",
@@ -29,11 +29,11 @@ export function getFileSize(size) {
   sliceFile 文件切片(支持多个)
   @params
     file: 上传文件
-    size: 限制大小
+    size: 文件大小
   @return
     chunks: 切完的文件分段列表
 */
-export const sliceFile = (file: any[], fileSize, size = SIZE) => {
+export const sliceFile = (file: any[], size = SIZE) => {
   const chunks: any[] = [];
   let curs = 0; // 所有文件已切进度
   for (let i = 0; i < file.length; i++) {
@@ -51,9 +51,6 @@ export const sliceFile = (file: any[], fileSize, size = SIZE) => {
       cur += curSize;
       curs += curSize;
     }
-    if (curs >= fileSize) {
-      break;
-    }
   }
   return chunks;
 }
@@ -63,6 +60,7 @@ export const sliceFile = (file: any[], fileSize, size = SIZE) => {
       chunks 文件分片
 */
 export const calculateHash = async (chunks: any[], cb: Function) => {
+  console.log(chunks, 'calculateHash===========')
   return new Promise((resolve, reject) => {
     const worker = new Worker('/hash.js') 
     worker.postMessage({chunks})

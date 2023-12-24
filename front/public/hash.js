@@ -38,7 +38,7 @@ self.onmessage = function(e) {
     }
   }
   // 启动
-  loadNext(0)
+  loadNext(count)
   // setTimeout(() => {
   //   self.postMessage({
   //     msg: 'worker计算完毕',

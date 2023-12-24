@@ -25,6 +25,7 @@ function UploadPage(props: any) {
     };
     setHashPress(0)
     setFileSize('')
+    /* **************** */
     const files = e.target.files;
     console.log(files, 'files===============')
     let sizeAll = 0;
@@ -39,9 +40,10 @@ function UploadPage(props: any) {
     }
     if (!files || !files.length) return;
     container.current = {
-      ...container,
+      ...container.current,
       file: files,
     };
+    console.log(container.current, 'container.current======')
   };
   /* 
     handleUpload 上传文件按钮触发
@@ -51,16 +53,16 @@ function UploadPage(props: any) {
       return 
     }
     // 文件切片
-    const fileChunk = sliceFile(container.current.file, fileSize);
+    const fileChunk = sliceFile(container.current.file);
     console.log("handleUpload", fileChunk);
-    console.time("samplehash");
+    // console.time("samplehash=========================");
     await calculateHash(fileChunk, (progress, hash) => {
       if (hash) {
         container.current = {
           ...container.current,
-          hash: hash,
+          hash: hash, // 每个文件都有独一无二的hash！！！
         };
-        console.timeEnd("samplehash");
+        // console.timeEnd("samplehash");
         const fileChunkTemp = fileChunk.map((chunk, index) => {
           const chunkName = container.current.hash + "-" + index;
           return {
@@ -69,6 +71,7 @@ function UploadPage(props: any) {
             filename: chunk.filename,
             index,
             hash: chunkName,
+            progress: 0,
             // progress: uploadedList.indexOf(chunkName) > -1 ? 100 : 0,
             size: chunk.file.size
           }
@@ -95,17 +98,66 @@ function UploadPage(props: any) {
       console.error()
     }
   }
-
+  /* 
+    sendRequest 上传处理
+    @param list: 文件数组
+            max: 通道 并发控制4个
+  */
   const sendRequest = async (list, max = 4) => {
-    list.forEach((item, index) => {
-      window.$api.uploadFile(item.form).then((res: any) => {
-        console.log(res, 'res') 
-      })
+    return new Promise<void>((resolve, reject) => {
+      const len = list.length - 1
+      let counter = 0 // 操作数
+      const retryArr = []
+      const start = async() => {
+        while ( counter < len - 1 && max > 0 ) {
+          max--
+          console.log(max, 'start')
+          const i = list.findIndex(v => v.status === Status.wait || v.status === Status.error)
+          if (i < 0) {
+            break
+          }
+          list[i].status = Status.uploading
+          const form = list[i].form
+          const index = list[i].index
+          if (typeof retryArr[index] === 'number') {
+            console.log(index, '开始重试===========')
+          }
+          window.$api.uploadFile(form).then(() => {
+            list[i].status = Status.done
+            max++ // 让出通道
+            counter++
+            list[counter].done = true
+            if (counter == len) {
+              resolve()
+            } else {
+              start()
+            }
+          }).catch(e => {
+            if (e.code !== 501) {
+              list[i].status = Status.error
+              if (typeof retryArr[index] !== 'number') {
+                retryArr[index] = 0
+              }
+              // 累计失败的次数
+              retryArr[index]++
+              if (retryArr[index] >= 2) { // 失败超过三次
+                console.log(retryArr, 'reject')
+                return reject()
+              }
+              chunksList.current[index].process = 0
+            }
+            max++ // 释放通道
+            start()
+          })
+        }
+      }
+      start()
     })
   }
   return (
     <div className={styles.container}>
-      <input type="file" multiple onChange={handleFileChange} />
+      {/* multiple */}
+      <input type="file"  onChange={handleFileChange} />
       <br />
       <hr />
       <Flex gap="small" wrap="wrap">
