@@ -1,7 +1,8 @@
-import { calculateHash, getFileSize, sliceFile, Status } from "@/utils";
-import { Flex, Progress } from "antd";
+import { calculateHash, getFileSize, sliceFile, Status, SIZE } from "@/utils";
+import { Flex, message, Progress } from "antd";
 import React, { useState, useEffect } from "react";
 import styles from "./styles/index.module.scss";
+
 function UploadPage(props: any) {
   const container = useRef<{
     file: any[],
@@ -45,6 +46,27 @@ function UploadPage(props: any) {
     };
     console.log(container.current, 'container.current======')
   };
+
+  /* 
+    verifyFile 获取已上传的片段
+  */
+  const verifyFile = async (filename, hash) => {
+    const data = await window.$api.verifyFile({
+      filename,
+      hash
+    })
+    return data
+  }
+  /* 
+    mergeFile 合并文件片段
+  */
+  const mergeFile = async (filename, hash) => {
+    await window.$api.mergeFile({
+      filename,
+      hash,
+      size: SIZE
+    })
+  }
   /* 
     handleUpload 上传文件按钮触发
   */
@@ -56,13 +78,18 @@ function UploadPage(props: any) {
     const fileChunk = sliceFile(container.current.file);
     console.log("handleUpload", fileChunk);
     // console.time("samplehash=========================");
-    await calculateHash(fileChunk, (progress, hash) => {
+    await calculateHash(fileChunk, async (progress, hash) => {
       if (hash) {
         container.current = {
           ...container.current,
           hash: hash, // 每个文件都有独一无二的hash！！！
         };
+        // 判断文件是否存在,如果不存在，获取已经上传的切片
+        const {uploaded, uploadedList} = await verifyFile(container.current.file[0].name, container.current.hash)
         // console.timeEnd("samplehash");
+        if (uploaded) {
+          return message.success('妙传: 上传成功')
+        }
         const fileChunkTemp = fileChunk.map((chunk, index) => {
           const chunkName = container.current.hash + "-" + index;
           return {
@@ -71,20 +98,20 @@ function UploadPage(props: any) {
             filename: chunk.filename,
             index,
             hash: chunkName,
-            progress: 0,
-            // progress: uploadedList.indexOf(chunkName) > -1 ? 100 : 0,
+            progress: uploadedList.indexOf(chunkName) > -1 ? 100 : 0,
             size: chunk.file.size
           }
         })
         chunksList.current = fileChunkTemp
-        uploadChunks()
+        uploadChunks(uploadedList)
       }
       setHashPress(progress)
     })
   }
-  const uploadChunks = async () => {
-    console.log(chunksList.current, 'chunksList')
-    const list = chunksList.current.map(({ fileHash, chunk, index, hash, filename}, idx) => {
+  const uploadChunks = async (uploadedList = []) => {
+    const list = chunksList.current
+    .filter(chunk => uploadedList.indexOf(chunk.hash) == -1)
+    .map(({ fileHash, chunk, index, hash, filename}, idx) => {
       const form = new FormData()
       form.append('fileHash', fileHash)
       form.append('hash', hash)
@@ -93,7 +120,10 @@ function UploadPage(props: any) {
       return { form, index, status: Status.wait };
     })
     try {
-      await sendRequest(list)
+      const result =  await sendRequest(list)
+      if (result && uploadedList.length + list.length === chunksList.current.length) {
+        await mergeFile(container.current.file[0].name, container.current.hash)
+      }
     } catch (e) {
       console.error()
     }
@@ -104,12 +134,12 @@ function UploadPage(props: any) {
             max: 通道 并发控制4个
   */
   const sendRequest = async (list, max = 4) => {
-    return new Promise<void>((resolve, reject) => {
-      const len = list.length - 1
+    return new Promise((resolve, reject) => {
+      const len = list.length
       let counter = 0 // 操作数
       const retryArr = []
       const start = async() => {
-        while ( counter < len - 1 && max > 0 ) {
+        while ( counter < len && max > 0 ) {
           max--
           console.log(max, 'start')
           const i = list.findIndex(v => v.status === Status.wait || v.status === Status.error)
@@ -122,18 +152,20 @@ function UploadPage(props: any) {
           if (typeof retryArr[index] === 'number') {
             console.log(index, '开始重试===========')
           }
-          window.$api.uploadFile(form).then(() => {
+          window.$api.uploadFile(form).then((res) => {
             list[i].status = Status.done
             max++ // 让出通道
-            counter++
             list[counter].done = true
+            counter++
             if (counter == len) {
-              resolve()
+              message.success('上传成功!!!');
+              resolve(true)
             } else {
               start()
             }
           }).catch(e => {
-            if (e.code !== 501) {
+            if (+e.code !== 501) {
+              message.error('上传失败!!!');
               list[i].status = Status.error
               if (typeof retryArr[index] !== 'number') {
                 retryArr[index] = 0
@@ -142,9 +174,11 @@ function UploadPage(props: any) {
               retryArr[index]++
               if (retryArr[index] >= 2) { // 失败超过三次
                 console.log(retryArr, 'reject')
-                return reject()
+                return reject(false)
               }
               chunksList.current[index].process = 0
+            } else if (+e.code === 501) {
+              message.info(e.msg);
             }
             max++ // 释放通道
             start()

@@ -20,5 +20,17 @@ export default {
     return await http.post(setProxy('/kevin/upload'), { data }, {
       'Content-Type': 'multipart/form-data'
     }, false, false)
+  },
+  /* 
+    verifyFile 获取已上传的切片列表
+  */
+  async verifyFile (data: any = {}): Promise<AxiosResponse<any, any>> {
+    return await http.post(setProxy('/kevin/verify'), { data }, null, false, false)
+  },
+  /* 
+    mergeFile 全部上传完后合并切片
+  */
+  async mergeFile (data: any = {}): Promise<AxiosResponse<any, any>> {
+    return await http.post(setProxy('/kevin/mergeFile'), { data }, null, false, false)
   }
 }

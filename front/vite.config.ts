@@ -11,6 +11,7 @@ import vitePluginImp from 'vite-plugin-imp'
 // https://vitejs.dev/config/
 export default ({mode, command}) => {
   const env= loadEnv(mode, process.cwd());   // 获取.env文件里定义的环境变量
+  console.log(env, 'env.VITE_BASE_URL')
   const analysPlugins: any[] = mode === 'analys' ? [
     visualizer({
       emitFile: false,
@@ -70,7 +71,8 @@ export default ({mode, command}) => {
       host: true,
       proxy: {
         "/api": {
-          target: env.VITE_BASE_URL,
+          // target: env.VITE_BASE_URL,
+          target: 'http://192.168.120.178:3000',
           changeOrigin: true,
           secure: false, // 解决代理https协议报错问题
           headers: {

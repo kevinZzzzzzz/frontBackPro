@@ -19,10 +19,10 @@ dotenv.config();
 app.use(cors({
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "*",
-  "Content-Type": "multipart/form-data",
+  // "Content-Type": "multipart/form-data",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
 }));
-app.use(express.json()); // post 请求获取请求体的参数
+// app.use(express.json()); // post 请求获取请求体的参数
 
 // const configuration = new Configuration({
 //   organization: process.env.OPENAI_API_PERSON_KEY,
@@ -47,8 +47,17 @@ app.use(express.json()); // post 请求获取请求体的参数
 //     });
 //     console.log(result)
 // });
+app.get('/kevin/test', (req, res) => {
+  res.send('kevin')
+})
 app.post('/kevin/upload', async (req, res) => {
   await ctrl.handleUpload(req, res)
+})
+app.post('/kevin/verify', async(req, res) => {
+  await ctrl.handleVerify(req, res)
+})
+app.post('/kevin/mergeFile', async(req, res) => {
+  await ctrl.handleMergeFile(req, res)
 })
 server.listen(port, () => {
   console.log(`Server listening on ${port}`);
