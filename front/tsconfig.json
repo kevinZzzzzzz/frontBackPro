@@ -20,5 +20,5 @@
       "@/*": ["src/*"],
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "**/*.ts", "**/*.tsx", "*.tsx",  "commitlint.cjs", "commitlint.config.js"]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "**/*.ts", "**/*.tsx", "*.tsx",  "commitlint.cjs", "commitlint.config.js", "src/electron.js"]
 }

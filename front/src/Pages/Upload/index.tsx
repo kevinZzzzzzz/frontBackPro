@@ -3,6 +3,7 @@ import { Flex, message, Progress } from "antd";
 import React, { useState, useEffect } from "react";
 import styles from "./styles/index.module.scss";
 
+
 function UploadPage(props: any) {
   const container = useRef<{
     file: any[],
@@ -88,7 +89,12 @@ function UploadPage(props: any) {
         const {uploaded, uploadedList} = await verifyFile(container.current.file[0].name, container.current.hash)
         // console.timeEnd("samplehash");
         if (uploaded) {
-          return message.success('妙传: 上传成功')
+          if (window?.$electronAPI) {
+            return window?.$electronAPI.showNotification('妙传', '上传成功' )
+          } else {
+            return message.success('妙传: 上传成功')
+          }
+          // 
         }
         const fileChunkTemp = fileChunk.map((chunk, index) => {
           const chunkName = container.current.hash + "-" + index;

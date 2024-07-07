@@ -1,0 +1,14 @@
+/** electron-builder.json */
+// 暂时先设置这两个配置防止打包后的应用出现的各种问题。（后面解释为什么需要设置）
+{
+  "extraMetadata": {
+    "main": "main/src/main.js"
+  },
+  "files": [
+    "dist/**/*",
+    "dist-electron/**/*"
+  ], // 设置需要打包的文件
+  "directories": {
+    "output": "release" // 设置出口文件
+  }
+}

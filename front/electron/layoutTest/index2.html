@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>响应式布局2</title>
+  <style>
+    html {
+      background-color: #000;
+    }
+    .animated-grid {
+      height: 85vh;
+      display: grid;
+      gap: 1rem;
+      grid-template-areas:
+        'a  b  c  d'
+        'l  🌟  🌟  e'
+        'k  🌟  🌟  f'
+        'g  h  i  j';
+      grid-template-rows: repeat(4, 25%);
+      grid-template-columns: 240px auto auto 240px;
+
+      --stagger-delay: 100ms;
+    }
+    .card {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      text-align: center;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 5px;
+      font-size: 24px;
+      font-weight: 600;
+      background-color: rgb(36, 243, 147);
+      animation: cardEntrance 700ms ease-out;
+      animation-fill-mode: backwards;
+    }
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: scale(0.3);
+        filter: hue-rotate(180deg)
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+        filter: hue-rotate(0deg)
+      }
+    }
+    @keyframes cardHover {
+      from {
+        transform: scale(1.05);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+    .card:hover {
+      animation: cardHover 1s;
+    }
+    .card:nth-child(1) {
+      grid-area: a;
+      animation-delay: calc(1 * var(--stagger-delay))
+    }
+    .card:nth-child(2) {
+      grid-area: b;
+      animation-delay: calc(2 * var(--stagger-delay))
+    }
+    .card:nth-child(3) {
+      grid-area: c;
+      animation-delay: calc(3 * var(--stagger-delay))
+    }
+    .card:nth-child(4) {
+      grid-area: d;
+      animation-delay: calc(4 * var(--stagger-delay))
+    }
+    .card:nth-child(5) {
+      grid-area: e;
+      animation-delay: calc(5 * var(--stagger-delay))
+    }
+    .card:nth-child(6) {
+      grid-area: f;
+      animation-delay: calc(6 * var(--stagger-delay))
+    }
+    .card:nth-child(7) {
+      grid-area: g;
+      animation-delay: calc(7 * var(--stagger-delay))
+    }
+    .card:nth-child(8) {
+      grid-area: h;
+      animation-delay: calc(8 * var(--stagger-delay))
+    }
+    .card:nth-child(9) {
+      grid-area: i;
+      animation-delay: calc(9 * var(--stagger-delay))
+    }
+    .card:nth-child(10) {
+      grid-area: j;
+      animation-delay: calc(10 * var(--stagger-delay))
+    }
+    .card:nth-child(11) {
+      grid-area: k;
+      animation-delay: calc(11 * var(--stagger-delay))
+    }
+    .card:nth-child(12) {
+      grid-area: l;
+      animation-delay: calc(12 * var(--stagger-delay))
+    }
+    .card:nth-child(13) {
+      grid-area: 🌟;
+      animation-delay: calc(13 * var(--stagger-delay))
+    }
+  </style>
+</head>
+<body>
+  <section class="animated-grid">
+    <div class="card">a</div>
+    <div class="card">b</div>
+    <div class="card">c</div>
+    <div class="card">d</div>
+    <div class="card">e</div>
+    <div class="card">f</div>
+    <div class="card">g</div>
+    <div class="card">h</div>
+    <div class="card">i</div>
+    <div class="card">j</div>
+    <div class="card">k</div>
+    <div class="card">l</div>
+    <div class="card">main</div>
+  </section>
+</body>
+</html>

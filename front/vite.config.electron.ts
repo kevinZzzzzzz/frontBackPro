@@ -5,7 +5,7 @@ import { manualChunksPlugin } from 'vite-plugin-webpackchunkname'
 import { visualizer } from 'rollup-plugin-visualizer';
 import AutoImport from 'unplugin-auto-import/vite'
 import AntdResolver from 'unplugin-auto-import-antd'
-import electronPlugin from 'vite-plugin-electron'
+import electron from 'vite-plugin-electron';
 
 import vitePluginImp from 'vite-plugin-imp'
 // eslint-disable-next-line no-undef
@@ -25,16 +25,11 @@ export default ({mode, command}) => {
   return defineConfig({
     plugins: [
       react(),
-      electronPlugin({
-        entry: ['electron/main.js', 'electron/preload.js'],
-        // vite: {
-        //   build: {
-        //     chunkSizeWarningLimit: 2048,
-        //     outDir: 'build/electron',
-        //     minify: 'terser',
-        //   },
-        // },
-      }),
+      electron([
+        {
+          entry: ['electron/main.js', 'electron/preload.js'],
+        }
+      ]),
       vitePluginImp({
         libList: [
           {
