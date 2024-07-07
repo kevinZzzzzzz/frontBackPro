@@ -8,7 +8,7 @@ import api from "@/Api";
 declare global {
   interface Window {
     $api: any,
-    $electronAPI: any
+    $electronAPI: any,
   }
 }
 /* 
