@@ -22,7 +22,7 @@ function ScrollPage(props: any) {
     const end = start + Math.ceil(viewHeight / HEIGHT);
     setVisibleData(list.slice(start, end));
     setStart(start);
-    setViewTransfrom(`translate3d(0,${start * HEIGHT}px,0)`);
+    // setViewTransfrom(`translate3d(0,${start * HEIGHT}px,0)`);
   };
   useEffect(() => {
     const containerDom = container.current;
