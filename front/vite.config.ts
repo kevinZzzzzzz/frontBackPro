@@ -1,57 +1,50 @@
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
-import { manualChunksPlugin } from 'vite-plugin-webpackchunkname'
-import { visualizer } from 'rollup-plugin-visualizer';
-import AutoImport from 'unplugin-auto-import/vite'
-import AntdResolver from 'unplugin-auto-import-antd'
-import electronPlugin from 'vite-plugin-electron'
+import { defineConfig, loadEnv } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { manualChunksPlugin } from "vite-plugin-webpackchunkname";
+import { visualizer } from "rollup-plugin-visualizer";
+import AutoImport from "unplugin-auto-import/vite";
+import AntdResolver from "unplugin-auto-import-antd";
 
-import vitePluginImp from 'vite-plugin-imp'
+import vitePluginImp from "vite-plugin-imp";
 // eslint-disable-next-line no-undef
 const getPath = (_path) => path.resolve(__dirname, _path);
 // https://vitejs.dev/config/
-export default ({mode, command}) => {
-  const env= loadEnv(mode, process.cwd());   // 获取.env文件里定义的环境变量
-  console.log(env, 'env.VITE_BASE_URL')
-  const analysPlugins: any[] = mode === 'analys' ? [
-    visualizer({
-      emitFile: false,
-      filename: "stats.html",
-      gzipSize: true,
-      open: true
-    })
-  ] : []
+export default ({ mode, command }) => {
+  const env = loadEnv(mode, process.cwd()); // 获取.env文件里定义的环境变量
+  console.log(env, "env.VITE_BASE_URL");
+  const analysPlugins: any[] =
+    mode === "analys"
+      ? [
+          visualizer({
+            emitFile: false,
+            filename: "stats.html",
+            gzipSize: true,
+            open: true,
+          }),
+        ]
+      : [];
   return defineConfig({
     plugins: [
       react(),
-      electronPlugin({
-        entry: ['electron/main.js', 'electron/preload.js'],
-        // vite: {
-        //   build: {
-        //     chunkSizeWarningLimit: 2048,
-        //     outDir: 'build/electron',
-        //     minify: 'terser',
-        //   },
-        // },
-      }),
       vitePluginImp({
         libList: [
           {
-            libName: 'antd',
+            libName: "antd",
             style: (name) => `antd/es/${name}/style`,
-          }
-        ]
+          },
+        ],
       }),
       AutoImport({
         resolvers: [AntdResolver()],
-        imports:["react", "react-router-dom"],
-        dts: 'src/type/auto-import.d.ts',    // 路径下自动生成文件夹存放全局指令
-        eslintrc: { // 开启eslint校验
+        imports: ["react", "react-router-dom"],
+        dts: "src/type/auto-import.d.ts", // 路径下自动生成文件夹存放全局指令
+        eslintrc: {
+          // 开启eslint校验
           enabled: true,
         },
       }),
-      manualChunksPlugin()
+      manualChunksPlugin(),
     ].concat(analysPlugins),
     build: {
       emptyOutDir: true,
@@ -59,24 +52,24 @@ export default ({mode, command}) => {
       // manifest: true, //开启manifest
       rollupOptions: {
         output: {
-          chunkFileNames: 'static/js/[name].[hash].js',
-          entryFileNames: 'static/js/[name].[hash].js',
-          assetFileNames: 'static/[ext]/[name].[hash].[ext]',
+          chunkFileNames: "static/js/[name].[hash].js",
+          entryFileNames: "static/js/[name].[hash].js",
+          assetFileNames: "static/[ext]/[name].[hash].[ext]",
           manualChunks(id: string) {
-            if (id.includes('node_modules')) {
-              return 'vendor'; //代码宰割为第三方包
+            if (id.includes("node_modules")) {
+              return "vendor"; //代码宰割为第三方包
             }
           },
-        }
-      }
+        },
+      },
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src')
-      }
+        "@": path.resolve(__dirname, "./src"),
+      },
     },
     define: {
-      'process.env': process.env
+      "process.env": process.env,
     },
     server: {
       port: 8881,
@@ -88,7 +81,7 @@ export default ({mode, command}) => {
           changeOrigin: true,
           secure: false, // 解决代理https协议报错问题
           headers: {
-            'Access-Control-Allow-Origin': '*'
+            "Access-Control-Allow-Origin": "*",
           },
           rewrite: (path: string) => path.replace(/^\/api/, ""),
         },
@@ -97,10 +90,10 @@ export default ({mode, command}) => {
     css: {
       preprocessorOptions: {
         // 全局样式引入
-        scss:{
+        scss: {
           additionalData: `@import "@/assets/styles/global.scss";`,
-        }
+        },
       },
-    }
-  })
-}
+    },
+  });
+};

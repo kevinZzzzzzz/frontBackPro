@@ -1,0 +1,14 @@
+
+.list {
+  position: relative;
+  top: 1;
+  background-color: #fff;
+  height: 100%;
+  overflow: scroll;
+  // border: 1px solid #000;
+  &_item {
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+  }
+}
